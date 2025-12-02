@@ -13,3 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
+model EtapaLaboratorio {
+  id            Int     @id @default(autoincrement()) @map("etapa_id")
+  laboratorioId Int     @map("laboratorio_id")
+  tipoEtapaId   Int     @map("tipo_etapa_id")
+  descripcion   String?
+  orden         Int     @default(1)
+
+  laboratorio Laboratorio          @relation(fields: [laboratorioId], references: [id])
+  tipoEtapa   TipoEtapa            @relation(fields: [tipoEtapaId], references: [id])
+  recursos    RecursoLaboratorio[]
+
+  @@map("etapas_laboratorio")
+}
+
+model RecursoLaboratorio {
+  id        Int         @id @default(autoincrement()) @map("recurso_id")
+  etapaId   Int         @map("etapa_id")
+  tipo      TipoRecurso
+  titulo    String
+  contenido String?     @db.VarChar(500)
+  orden     Int         @default(1)
+
+  etapa EtapaLaboratorio @relation(fields: [etapaId], references: [id])
+
+  @@map("recursos_laboratorio")
+}
+
