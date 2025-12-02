@@ -13,3 +13,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model LaboratorioParticipante {
+  id                 Int                  @id @default(autoincrement()) @map("laboratorio_participante_id")
+  laboratorioGrupoId Int                  @map("laboratorio_grupo_id")
+  usuarioId          Int                  @map("usuario_id")
+  progreso           ProgresoParticipante @default(no_iniciado) @map("progreso")
+
+  fechaUnion DateTime @default(now()) @map("fecha_union")
+
+  grupo   LaboratorioGrupo @relation(fields: [laboratorioGrupoId], references: [id])
+  usuario Usuario          @relation(fields: [usuarioId], references: [id])
+
+  respuestasCuestionario RespuestaCuestionario[]
+  informes               InformePDF[]
+
+  @@unique([usuarioId, laboratorioGrupoId])
+  @@map("laboratorios_participantes")
+}
+
+model Cuestionario {
+  id            Int      @id @default(autoincrement()) @map("cuestionario_id")
+  laboratorioId Int      @map("laboratorio_id")
+  nombre        String
+  descripcion   String?
+  fechaCreacion DateTime @default(now()) @map("fecha_creacion")
+
+  laboratorio Laboratorio @relation(fields: [laboratorioId], references: [id])
+  preguntas   Pregunta[]
+
+  @@map("cuestionarios")
+}
