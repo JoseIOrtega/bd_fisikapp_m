@@ -1,11 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+generator client {
+  provider = "prisma-client-js"
+}
 
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
 
+// ===================== ENUMS ==========================
 
+enum EstadoLaboratorio {
+  activo
+  inactivo
+}
 
+enum TipoRecurso {
+  texto
+  imagen
+  video
+  audio
+  enlace
+}
 
+enum ProgresoParticipante {
+  no_iniciado @map("no iniciado")
+  en_progreso @map("en progreso")
+  finalizado  @map("finalizado")
+}
 
+enum EstadoGrupo {
+  activo
+  inactivo
+}
+
+enum TipoPregunta {
+  uno    @map("1")
+  dos    @map("2")
+  tres   @map("3")
+  cuatro @map("4")
+}
+
+enum EstadoInforme {
+  generado
+  pendiente
+  error
+}
 
 //----------Jose
 
