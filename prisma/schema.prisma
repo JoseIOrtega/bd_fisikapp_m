@@ -12,7 +12,7 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
+//----------JOSE
 model Usuario {
   id            Int      @id @default(autoincrement()) @map("usuario_id")
   nombre        String
@@ -35,3 +35,34 @@ model Categoria {
 
   @@map("categorias")
 }
+// ----- Edward
+model TipoEtapa {
+  id          Int     @id @default(autoincrement()) @map("tipo_etapa_id")
+  nombre      String  @unique
+  descripcion String?
+
+  etapas EtapaLaboratorio[]
+
+  @@map("tipos_etapa")
+}
+
+model Laboratorio {
+  id            Int               @id @default(autoincrement()) @map("laboratorio_id")
+  titulo        String
+  descripcion   String?
+  categoriaId   Int               @map("categoria_id")
+  tieneRa       Boolean           @default(false) @map("tiene_ra")
+  estado        EstadoLaboratorio @default(activo)
+  fechaCreacion DateTime          @default(now()) @map("fecha_creacion")
+  creadorId     Int               @map("creador_id")
+
+  creador       Usuario            @relation("CreadorLaboratorios", fields: [creadorId], references: [id])
+  categoria     Categoria          @relation(fields: [categoriaId], references: [id])
+  etapas        EtapaLaboratorio[]
+  recursosRa    RecursoRA[]
+  grupos        LaboratorioGrupo[]
+  cuestionarios Cuestionario[]
+
+  @@map("laboratorios")
+}
+//----Cristian
