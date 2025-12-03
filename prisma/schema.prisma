@@ -140,10 +140,8 @@ model Pregunta {
   cuestionarioId Int          @map("cuestionario_id")
   tipo           TipoPregunta
   enunciado      String
-
   cuestionario Cuestionario @relation(fields: [cuestionarioId], references: [id])
   respuestas   Respuesta[]
-
   @@map("preguntas")
 }
 model Respuesta {
@@ -151,10 +149,8 @@ model Respuesta {
   preguntaId Int     @map("pregunta_id")
   enunciado  String
   correcta   Boolean @default(false)
-
   pregunta               Pregunta                @relation(fields: [preguntaId], references: [id])
   respuestasCuestionario RespuestaCuestionario[]
-
   @@map("respuestas")
 }
 
