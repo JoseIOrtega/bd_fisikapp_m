@@ -13,3 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Usuario {
+  id            Int      @id @default(autoincrement()) @map("usuario_id")
+  nombre        String
+  correo        String   @unique
+  contrasena    String
+  fechaCreacion DateTime @default(now()) @map("fecha_creacion")
+
+  laboratoriosCreados Laboratorio[]             @relation("CreadorLaboratorios")
+  participantes       LaboratorioParticipante[]
+
+  @@map("usuarios")
+}
+
+model Categoria {
+  id          Int     @id @default(autoincrement()) @map("categoria_id")
+  nombre      String  @unique
+  descripcion String?
+
+  laboratorios Laboratorio[]
+
+  @@map("categorias")
+}

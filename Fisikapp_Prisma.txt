@@ -1,0 +1,202 @@
+// ===================== JOSE 
+
+model Usuario {
+  id            Int      @id @default(autoincrement()) @map("usuario_id")
+  nombre        String
+  correo        String   @unique
+  contrasena    String
+  fechaCreacion DateTime @default(now()) @map("fecha_creacion")
+
+  laboratoriosCreados Laboratorio[]             @relation("CreadorLaboratorios")
+  participantes       LaboratorioParticipante[]
+
+  @@map("usuarios")
+}
+
+model Categoria {
+  id          Int     @id @default(autoincrement()) @map("categoria_id")
+  nombre      String  @unique
+  descripcion String?
+
+  laboratorios Laboratorio[]
+
+  @@map("categorias")
+}
+
+// ===================== EDUARD
+
+model TipoEtapa {
+  id          Int     @id @default(autoincrement()) @map("tipo_etapa_id")
+  nombre      String  @unique
+  descripcion String?
+
+  etapas EtapaLaboratorio[]
+
+  @@map("tipos_etapa")
+}
+
+model Laboratorio {
+  id            Int               @id @default(autoincrement()) @map("laboratorio_id")
+  titulo        String
+  descripcion   String?
+  categoriaId   Int               @map("categoria_id")
+  tieneRa       Boolean           @default(false) @map("tiene_ra")
+  estado        EstadoLaboratorio @default(activo)
+  fechaCreacion DateTime          @default(now()) @map("fecha_creacion")
+  creadorId     Int               @map("creador_id")
+
+  creador       Usuario            @relation("CreadorLaboratorios", fields: [creadorId], references: [id])
+  categoria     Categoria          @relation(fields: [categoriaId], references: [id])
+  etapas        EtapaLaboratorio[]
+  recursosRa    RecursoRA[]
+  grupos        LaboratorioGrupo[]
+  cuestionarios Cuestionario[]
+
+  @@map("laboratorios")
+}
+
+// ===================== CRISTHIAN
+
+model EtapaLaboratorio {
+  id            Int     @id @default(autoincrement()) @map("etapa_id")
+  laboratorioId Int     @map("laboratorio_id")
+  tipoEtapaId   Int     @map("tipo_etapa_id")
+  descripcion   String?
+  orden         Int     @default(1)
+
+  laboratorio Laboratorio          @relation(fields: [laboratorioId], references: [id])
+  tipoEtapa   TipoEtapa            @relation(fields: [tipoEtapaId], references: [id])
+  recursos    RecursoLaboratorio[]
+
+  @@map("etapas_laboratorio")
+}
+
+model RecursoLaboratorio {
+  id        Int         @id @default(autoincrement()) @map("recurso_id")
+  etapaId   Int         @map("etapa_id")
+  tipo      TipoRecurso
+  titulo    String
+  contenido String?     @db.VarChar(500)
+  orden     Int         @default(1)
+
+  etapa EtapaLaboratorio @relation(fields: [etapaId], references: [id])
+
+  @@map("recursos_laboratorio")
+}
+
+// ===================== SEBASTIAN
+
+model RecursoRA {
+  id            Int     @id @default(autoincrement()) @map("ra_id")
+  laboratorioId Int     @map("laboratorio_id")
+  urlModelo     String  @db.VarChar(500)  @map("url_del_modelo")
+  urlMarcador   String? @db.VarChar(500)  @map("url_del_marcador")
+  descripcion   String?
+
+  laboratorio Laboratorio @relation(fields: [laboratorioId], references: [id])
+
+  @@map("recursos_ra")
+}
+
+model LaboratorioGrupo {
+  id            Int         @id @default(autoincrement()) @map("laboratorio_grupo_id")
+  laboratorioId Int         @map("laboratorio_id")
+  nombreGrupo   String      @map("nombre_grupo")
+  codigoFicha   String?     @map("codigo_ficha")
+  linkAcceso    String      @unique @map("link_acceso")
+  estado        EstadoGrupo @default(activo)
+  fechaApertura DateTime    @default(now()) @map("fecha_apertura")
+
+  laboratorio   Laboratorio               @relation(fields: [laboratorioId], references: [id])
+  participantes LaboratorioParticipante[]
+
+  @@map("laboratorios_grupos")
+}
+
+// ===================== EDWUIN
+
+model LaboratorioParticipante {
+  id                 Int                  @id @default(autoincrement()) @map("laboratorio_participante_id")
+  laboratorioGrupoId Int                  @map("laboratorio_grupo_id")
+  usuarioId          Int                  @map("usuario_id")
+  progreso           ProgresoParticipante @default(no_iniciado) @map("progreso")
+
+  fechaUnion DateTime @default(now()) @map("fecha_union")
+
+  grupo   LaboratorioGrupo @relation(fields: [laboratorioGrupoId], references: [id])
+  usuario Usuario          @relation(fields: [usuarioId], references: [id])
+
+  respuestasCuestionario RespuestaCuestionario[]
+  informes               InformePDF[]
+
+  @@unique([usuarioId, laboratorioGrupoId])
+  @@map("laboratorios_participantes")
+}
+
+model Cuestionario {
+  id            Int      @id @default(autoincrement()) @map("cuestionario_id")
+  laboratorioId Int      @map("laboratorio_id")
+  nombre        String
+  descripcion   String?
+  fechaCreacion DateTime @default(now()) @map("fecha_creacion")
+
+  laboratorio Laboratorio @relation(fields: [laboratorioId], references: [id])
+  preguntas   Pregunta[]
+
+  @@map("cuestionarios")
+}
+
+// ===================== ALEXANDRA
+
+model Pregunta {
+  id             Int          @id @default(autoincrement()) @map("pregunta_id")
+  cuestionarioId Int          @map("cuestionario_id")
+  tipo           TipoPregunta
+  enunciado      String
+
+  cuestionario Cuestionario @relation(fields: [cuestionarioId], references: [id])
+  respuestas   Respuesta[]
+
+  @@map("preguntas")
+}
+
+model Respuesta {
+  id         Int     @id @default(autoincrement()) @map("respuesta_id")
+  preguntaId Int     @map("pregunta_id")
+  enunciado  String
+  correcta   Boolean @default(false)
+
+  pregunta               Pregunta                @relation(fields: [preguntaId], references: [id])
+  respuestasCuestionario RespuestaCuestionario[]
+
+  @@map("respuestas")
+}
+
+// ===================== DIANA
+
+model RespuestaCuestionario {
+  id                        Int      @id @default(autoincrement())
+  laboratorioParticipanteId Int      @map("laboratorio_participante_id")
+  respuestaElegidaId        Int      @map("respuesta_elegida_id")
+  esCorrecta                Boolean
+  fechaRespuesta            DateTime @default(now()) @map("fecha_respuesta")
+
+  participante LaboratorioParticipante @relation(fields: [laboratorioParticipanteId], references: [id])
+  respuesta    Respuesta               @relation(fields: [respuestaElegidaId], references: [id])
+
+  @@map("respuestas_cuestionario")
+}
+
+model InformePDF {
+  id                        Int           @id @default(autoincrement()) @map("informe_id")
+  laboratorioParticipanteId Int           @map("laboratorio_participante_id")
+  intento                   Int           @default(1)
+  nombreArchivo             String        @map("nombre_archivo")
+  fechaGenerado             DateTime      @default(now()) @map("fecha_generado")
+  estado                    EstadoInforme @default(pendiente)
+
+  participante LaboratorioParticipante @relation(fields: [laboratorioParticipanteId], references: [id])
+
+  @@unique([laboratorioParticipanteId, intento])
+  @@map("informes_pdf")
+}
