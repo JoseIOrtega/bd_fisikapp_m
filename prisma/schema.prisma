@@ -154,4 +154,31 @@ model Respuesta {
   @@map("respuestas")
 }
 
+//------ Diana
 
+model RespuestaCuestionario {
+  id                        Int      @id @default(autoincrement())
+  laboratorioParticipanteId Int      @map("laboratorio_participante_id")
+  respuestaElegidaId        Int      @map("respuesta_elegida_id")
+  esCorrecta                Boolean
+  fechaRespuesta            DateTime @default(now()) @map("fecha_respuesta")
+
+  participante LaboratorioParticipante @relation(fields: [laboratorioParticipanteId], references: [id])
+  respuesta    Respuesta               @relation(fields: [respuestaElegidaId], references: [id])
+
+  @@map("respuestas_cuestionario")
+}
+
+model InformePDF {
+  id                        Int           @id @default(autoincrement()) @map("informe_id")
+  laboratorioParticipanteId Int           @map("laboratorio_participante_id")
+  intento                   Int           @default(1)
+  nombreArchivo             String        @map("nombre_archivo")
+  fechaGenerado             DateTime      @default(now()) @map("fecha_generado")
+  estado                    EstadoInforme @default(pendiente)
+
+  participante LaboratorioParticipante @relation(fields: [laboratorioParticipanteId], references: [id])
+
+  @@unique([laboratorioParticipanteId, intento])
+  @@map("informes_pdf")
+}
