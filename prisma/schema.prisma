@@ -59,7 +59,6 @@ model Laboratorio {
   recursosRa    RecursoRA[]
   grupos        LaboratorioGrupo[]
   cuestionarios Cuestionario[]
-
   @@map("laboratorios")
 }
 
@@ -71,11 +70,9 @@ model EtapaLaboratorio {
   tipoEtapaId   Int     @map("tipo_etapa_id")
   descripcion   String?
   orden         Int     @default(1)
-
   laboratorio Laboratorio          @relation(fields: [laboratorioId], references: [id])
   tipoEtapa   TipoEtapa            @relation(fields: [tipoEtapaId], references: [id])
   recursos    RecursoLaboratorio[]
-
   @@map("etapas_laboratorio")
 }
 model RecursoLaboratorio {
@@ -85,11 +82,34 @@ model RecursoLaboratorio {
   titulo    String
   contenido String?     @db.VarChar(500)
   orden     Int         @default(1)
-
   etapa EtapaLaboratorio @relation(fields: [etapaId], references: [id])
-
   @@map("recursos_laboratorio")
 }
 
 //----Sebastian
+
+model RecursoRA {
+  id            Int     @id @default(autoincrement()) @map("ra_id")
+  laboratorioId Int     @map("laboratorio_id")
+  urlModelo     String  @db.VarChar(500)  @map("url_del_modelo")
+  urlMarcador   String? @db.VarChar(500)  @map("url_del_marcador")
+  descripcion   String?
+  laboratorio Laboratorio @relation(fields: [laboratorioId], references: [id])
+  @@map("recursos_ra")
+}
+
+model LaboratorioGrupo {
+  id            Int         @id @default(autoincrement()) @map("laboratorio_grupo_id")
+  laboratorioId Int         @map("laboratorio_id")
+  nombreGrupo   String      @map("nombre_grupo")
+  codigoFicha   String?     @map("codigo_ficha")
+  linkAcceso    String      @unique @map("link_acceso")
+  estado        EstadoGrupo @default(activo)
+  fechaApertura DateTime    @default(now()) @map("fecha_apertura")
+  laboratorio   Laboratorio               @relation(fields: [laboratorioId], references: [id])
+  participantes LaboratorioParticipante[]
+  @@map("laboratorios_grupos")
+}
+
+//----Edwin
 
