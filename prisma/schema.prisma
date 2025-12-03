@@ -12,17 +12,17 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-//----------JOSE
+
+//----------Jose
+
 model Usuario {
   id            Int      @id @default(autoincrement()) @map("usuario_id")
   nombre        String
   correo        String   @unique
   contrasena    String
   fechaCreacion DateTime @default(now()) @map("fecha_creacion")
-
   laboratoriosCreados Laboratorio[]             @relation("CreadorLaboratorios")
   participantes       LaboratorioParticipante[]
-
   @@map("usuarios")
 }
 
@@ -30,19 +30,17 @@ model Categoria {
   id          Int     @id @default(autoincrement()) @map("categoria_id")
   nombre      String  @unique
   descripcion String?
-
   laboratorios Laboratorio[]
-
   @@map("categorias")
 }
+
 // ----- Edward
+
 model TipoEtapa {
   id          Int     @id @default(autoincrement()) @map("tipo_etapa_id")
   nombre      String  @unique
   descripcion String?
-
   etapas EtapaLaboratorio[]
-
   @@map("tipos_etapa")
 }
 
@@ -55,7 +53,6 @@ model Laboratorio {
   estado        EstadoLaboratorio @default(activo)
   fechaCreacion DateTime          @default(now()) @map("fecha_creacion")
   creadorId     Int               @map("creador_id")
-
   creador       Usuario            @relation("CreadorLaboratorios", fields: [creadorId], references: [id])
   categoria     Categoria          @relation(fields: [categoriaId], references: [id])
   etapas        EtapaLaboratorio[]
@@ -65,4 +62,34 @@ model Laboratorio {
 
   @@map("laboratorios")
 }
+
 //----Cristian
+
+model EtapaLaboratorio {
+  id            Int     @id @default(autoincrement()) @map("etapa_id")
+  laboratorioId Int     @map("laboratorio_id")
+  tipoEtapaId   Int     @map("tipo_etapa_id")
+  descripcion   String?
+  orden         Int     @default(1)
+
+  laboratorio Laboratorio          @relation(fields: [laboratorioId], references: [id])
+  tipoEtapa   TipoEtapa            @relation(fields: [tipoEtapaId], references: [id])
+  recursos    RecursoLaboratorio[]
+
+  @@map("etapas_laboratorio")
+}
+model RecursoLaboratorio {
+  id        Int         @id @default(autoincrement()) @map("recurso_id")
+  etapaId   Int         @map("etapa_id")
+  tipo      TipoRecurso
+  titulo    String
+  contenido String?     @db.VarChar(500)
+  orden     Int         @default(1)
+
+  etapa EtapaLaboratorio @relation(fields: [etapaId], references: [id])
+
+  @@map("recursos_laboratorio")
+}
+
+//----Sebastian
+
